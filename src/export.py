@@ -34,7 +34,6 @@ def export_onnx(weights_path, img_size=(28, 28), batch_size=1, device='cpu'):
     # Kiểm tra và lưu
     onnx_model = onnx.load(onnx_file)
     onnx.checker.check_model(onnx_model)
-    onnx.save(onnx_model, onnx_file)
     print(f"ONNX export success, saved as {onnx_file}")
     print(f"Export complete (%.2fs). Visualize with https://github.com/lutzroeder/netron." % (time.time() - t))
 
