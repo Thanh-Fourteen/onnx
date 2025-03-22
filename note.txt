@@ -1,0 +1,16 @@
+Convert ONNX models to ORT format script usage :
+python -m onnxruntime.tools.convert_onnx_models_to_ort <onnx model file or dir>
+
+
+# Generated from model/s:
+# - /home/tony/Learn/onnx/weights/best_model.ort
+ai.onnx;13;Flatten,Gemm
+com.microsoft;1;FusedGemm
+
+13: Chỉ phiên bản opset (operator set) của ONNX mà mô hình sử dụng.
+Flatten,Gemm: Đây là danh sách các toán tử cụ thể được sử dụng trong mô hình:
+Gemm: Viết tắt của "General Matrix Multiplication" (Nhân ma trận tổng quát).
+
+com.microsoft: Đây là domain do Microsoft định nghĩa, thường chứa các toán tử tối ưu hóa hoặc mở rộng không có trong domain tiêu chuẩn ai.onnx.
+1: Phiên bản opset của domain com.microsoft.
+FusedGemm: Đây là một phiên bản "fused" (tối ưu hóa) của toán tử Gemm.
