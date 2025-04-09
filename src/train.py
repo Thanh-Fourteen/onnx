@@ -4,6 +4,7 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
+import torch.nn.functional as F
 import os
 from tqdm import tqdm  
 
@@ -41,6 +42,58 @@ class SimpleNN(nn.Module):
         x = self.relu2(x)
         x = self.layer3(x)
         return x
+
+class EnhancedNN(nn.Module):
+    def __init__(self):
+        super(EnhancedNN, self).__init__()
+        self.flatten = nn.Flatten()
+        
+        # BatchNorm và Wide layer đầu tiên
+        self.bn1 = nn.BatchNorm1d(784)  # BatchNorm cho input 28*28
+        self.wide1 = nn.Linear(784, 1024)  # Wide layer
+        
+        # Attention mechanism
+        self.attention = nn.MultiheadAttention(embed_dim=1024, num_heads=8)
+        
+        # Deep path
+        self.deep1 = nn.Linear(1024, 512)
+        self.bn2 = nn.BatchNorm1d(512)
+        self.deep2 = nn.Linear(512, 256)
+        self.bn3 = nn.BatchNorm1d(256)
+        
+        # Output layer
+        self.output = nn.Linear(256 + 1024, 10)  # Kết hợp deep và wide
+        
+    def forward(self, x):
+        # Flatten input
+        x = self.flatten(x)  # [batch_size, 784]
+        
+        # BatchNorm
+        x = self.bn1(x)
+        
+        # Wide path
+        wide = self.wide1(x)  # [batch_size, 1024]
+        wide = F.relu(wide)
+        
+        # Attention - cần thêm chiều sequence (tạm dùng 1)
+        attn_input = wide.unsqueeze(0)  # [1, batch_size, 1024]
+        attn_output, _ = self.attention(attn_input, attn_input, attn_input)
+        attn_output = attn_output.squeeze(0)  # [batch_size, 1024]
+        
+        # Deep path
+        deep = self.deep1(attn_output)  # [batch_size, 512]
+        deep = self.bn2(deep)
+        deep = F.relu(deep)
+        deep = self.deep2(deep)  # [batch_size, 256]
+        deep = self.bn3(deep)
+        deep = F.relu(deep)
+        
+        # Kết hợp Deep và Wide
+        combined = torch.cat([deep, wide], dim=1)  # [batch_size, 256 + 1024]
+        
+        # Output
+        out = self.output(combined)
+        return out
 
 # 5. Huấn luyện và đánh giá mô hình
 def train(model, model_path, train_loader, val_loader, criterion, optimizer, epochs=5):
@@ -98,9 +151,10 @@ def train(model, model_path, train_loader, val_loader, criterion, optimizer, epo
 
 if __name__ == '__main__':
     # 4. Khởi tạo mô hình, loss function và optimizer
-    model = SimpleNN().to(device)
+    # model = SimpleNN().to(device)
+    model = EnhancedNN().to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr = 0.001)
     root = os.getcwd()
-    model_path = os.path.join(root, "weights", "best_model.pth")
+    model_path = os.path.join(root, "weights", "enhanced.pth")
     train(model, model_path, train_loader, val_loader, criterion, optimizer, epochs=5)

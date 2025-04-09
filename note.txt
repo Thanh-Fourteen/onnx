@@ -1,6 +1,6 @@
 Convert ONNX models to ORT format script usage :
 python -m onnxruntime.tools.convert_onnx_models_to_ort <onnx model file or dir>
-
+python -m onnxruntime.tools.convert_onnx_models_to_ort  eights/enhanced.onnx
 
 # Generated from model/s:
 # - /home/tony/Learn/onnx/weights/best_model.ort

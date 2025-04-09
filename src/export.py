@@ -2,11 +2,12 @@ import os
 import torch
 import time
 import onnx
-from train import SimpleNN
+# from train import SimpleNN
+from train import EnhancedNN
 
 def export_onnx(weights_path, img_size=(28, 28), batch_size=1, device='cpu'):
     # Load model từ file .pth
-    model = SimpleNN().to(device)
+    model = EnhancedNN().to(device)
     model.load_state_dict(torch.load(weights_path))
     model.eval()
 
@@ -41,7 +42,7 @@ def export_onnx(weights_path, img_size=(28, 28), batch_size=1, device='cpu'):
 
 if __name__ == '__main__':
     root = os.getcwd()
-    model_path = os.path.join(root, "weights", "best_model.pth")
+    model_path = os.path.join(root, "weights", "enhanced.pth")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     onnx_file = export_onnx(model_path, img_size=(28, 28), batch_size=1, device=device)
     

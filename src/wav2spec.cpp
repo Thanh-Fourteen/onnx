@@ -116,6 +116,7 @@ int main() {
 
         // Tính magnitude spectrum
         for (int i = 0; i < window_size/2 + 1; i++) {
+            // Phần thực và phần ảo của 1 số phức
             double real = out[i][0];
             double imag = out[i][1];
             spectrogram[frame][i] = sqrt(real*real + imag*imag);
